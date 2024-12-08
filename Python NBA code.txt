@@ -1,0 +1,64 @@
+import pandas as pd
+import requests
+pd.set_option('display.max_columns', None)
+import time
+import numpy as py
+from pandas import DataFrame
+imp
+
+r= requests.get(url=test_url).json()
+
+test_url= 'https://stats.nba.com/stats/leagueLeaders?LeagueID=00&PerMode=Totals&Scope=S&Season=2000-01&SeasonType=Regular%20Season&StatCategory=PTS'
+
+uy=pd.DataFrame(r['resultSet']['rowSet'], columns =table_headers)
+uy
+
+df_cols=['Year','Season_type']+table_headers
+
+pd.DataFrame(columns=df_cols)
+
+headers = {
+    "Accept": "*/*",
+    "Accept-Encoding": "gzip, deflate, br, zstd",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Connection": "keep-alive",
+    "Host": "stats.nba.com",
+    "Origin": "https://www.nba.com",
+    "Referer": "https://www.nba.com/",
+    "Sec-CH-UA": '"Chromium";v="130", "Google Chrome";v="130", "Not?A_Brand";v="99"',
+    "Sec-CH-UA-Mobile": "?0",
+    "Sec-CH-UA-Platform": '"Windows"',
+    "Sec-Fetch-Dest": "empty",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Site": "same-site",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
+}
+
+df = pd.DataFrame(columns=df_cols)
+season_types = ['RegularSeason','Playoffs']
+years =['2000-01',
+       '2001-02',
+       '2002-03',
+       '2003-04',
+       '2004-05',
+       '2005-06',
+       '2006-07',
+       '2007-08',
+       '2008-09',
+       '2010-11',]
+begin_loop = time.time()
+for y in years:
+    for s in season_types:
+        api_url ='https://stats.nba.com/stats/leagueLeaders?LeagueID=00&PerMode=Totals&Scope=S&Season=+y+&SeasonType=+s+&StatCategory=PTS'
+        r = requests.get(url=api_url, headers=headers).json()
+        temp_df1= uy
+        temp_df2 = pd.DataFrame({'Year':[y for i in range(len(temp_df1))],
+                                'Season_type':[s for i in range(len(temp_df1))]})
+        temp_df3 = pd.concat([temp_df2,temp_df1], axis=1)
+        df = pd.concat([df,temp_df3], axis=0)
+        print(f'Finished scraping data for {y} {s}).')
+        lag = py.random.uniform(low=5,high=30)
+        time.sleep(lag)
+print(f'Process Completed! Total run time: {round((time.time()-begin_loop)/60,2)}')
+df.to_excel('nba_player_data.xlsx', index =False)
+df
